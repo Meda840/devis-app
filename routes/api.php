@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DevisController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/hello', [DevisController::class, 'index']);
-
+Route::get('/currencies', [DevisController::class, 'getAllCurrencies']);
+Route::get('/services',[DevisController::class, 'getAllServices']);
 Route::post('/devis', [DevisController::class, 'store']);
 Route::get('/generate-pdf/{id}', [DevisController::class, 'generatePdf']);
+
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);

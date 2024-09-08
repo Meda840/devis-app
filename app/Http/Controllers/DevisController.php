@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Devis;
+use App\Models\Currency;
 use App\Models\DevisTask;
+use App\Models\Service;
 use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +20,19 @@ class DevisController extends Controller
     {
         return response()->json(['message' => 'Hello, World!'], 200);
     }
+
+    public function getAllCurrencies()
+    {
+        $currencies = Currency::all();
+        return response()->json($currencies);
+    }
+
+    public function getAllServices()
+    {
+        $services = Service::all();
+        return response()->json($services);
+    }
+
     /**
      * Store a newly created Devis in storage.
      *
