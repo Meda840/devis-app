@@ -60,7 +60,7 @@ class DevisController extends Controller
             'description' => 'required',
             'amount' => 'required|numeric',
             'date_devis' => 'required|date',
-
+            'tax_rate' => 'nullable',
             // Tasks details
             'tasks' => 'required|array',
             'tasks.*.item_description' => 'required|string|max:255',

@@ -20,7 +20,7 @@ class Devis extends Model
         'pro_city',
         'pro_siret',
         'client_name',
-
+        'tax_rate',
         'client_address',
         'client_city',
         'client_siret',
