@@ -34,6 +34,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_user');
+    }
+
     /**
      * The attributes that should be cast.
      *

@@ -17,7 +17,7 @@ return [
 
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
-        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        'localhost,localhost:3000,localhost:5173,192.168.0.12,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort()
     ))),
 
@@ -32,8 +32,20 @@ return [
     | token that's present on an incoming request for authentication.
     |
     */
+'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
 
-    'guard' => ['web'],
+    'api' => [
+        'driver' => 'sanctum',
+        'provider' => 'users',
+
+    ],
+],
+
+
 
     /*
     |--------------------------------------------------------------------------

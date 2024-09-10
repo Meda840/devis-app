@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -92,8 +94,28 @@ class AuthController extends Controller
 
     public function getUserInfo(Request $request)
 {
+    Log::info('Request Headers:', $request->headers->all());
+    Log::info('Authorization Header:', $request->header('Authorization'));
     return response()->json([
         'user' => $request->user()
+    ]);
+}
+
+public function updateUser(Request $request)
+{
+    $user = Auth::user();
+
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+    ]);
+
+    $user->update($validated);
+
+    return response()->json([
+        'message' => 'User information updated successfully',
+        'user' => $user
     ]);
 }
 

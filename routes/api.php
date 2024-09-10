@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DevisController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 /*
 |--------------------------------------------------------------------------
@@ -19,8 +20,9 @@ use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 
-
 });
+Route::middleware('auth:sanctum')->put('/user', [AuthController::class, 'updateUser']);
+Route::middleware('auth:sanctum')->post('/companies', [DashboardController::class, 'store']);
 
 Route::get('/hello', [DevisController::class, 'index']);
 Route::get('/currencies', [DevisController::class, 'getAllCurrencies']);
@@ -31,6 +33,3 @@ Route::get('/generate-pdf/{id}', [DevisController::class, 'generatePdf']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
-
-Route::get('/user-info', [AuthController::class, 'getUserInfo']);
