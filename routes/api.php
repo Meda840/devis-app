@@ -21,8 +21,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 
 });
+Route::post('/logout', function (Request $request) {
+    $request->session()->invalidate(); // Clear session
+    $request->session()->regenerateToken(); // Regenerate CSRF token
+    return response()->json(['message' => 'Logged out successfully']);
+});
+Route::middleware('auth:sanctum')->get('/user/companies', [DashboardController::class, 'getUserWithCompanies']);
 Route::middleware('auth:sanctum')->put('/user', [AuthController::class, 'updateUser']);
-Route::middleware('auth:sanctum')->post('/companies', [DashboardController::class, 'store']);
+Route::middleware('auth:sanctum')->post('/companies', [DashboardController::class, 'storeCompany']);
+Route::middleware('auth:sanctum')->put('companies/{id}', [DashboardController::class, 'updateCompany']);
 
 Route::get('/hello', [DevisController::class, 'index']);
 Route::get('/currencies', [DevisController::class, 'getAllCurrencies']);

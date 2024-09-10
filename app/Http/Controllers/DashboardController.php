@@ -13,7 +13,19 @@ use Illuminate\Support\Facades\Validator;
 class DashboardController extends Controller
 {
 
-    public function store(Request $request)
+    public function getUserWithCompanies()
+{
+    // Retrieve the authenticated user and load their companies
+    $user = Auth::user()->load('companies');
+
+    // Return the user with the associated companies in JSON format
+    return response()->json([
+        'user' => $user,
+        'companies' => $user->companies,
+    ], 200);
+}
+
+    public function storeCompany(Request $request)
     {
         // Validate the incoming request
         $validatedData = $request->validate([
@@ -45,4 +57,23 @@ class DashboardController extends Controller
         ], 201);
     }
 
+    public function updateCompany(Request $request, Company $company)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:20',
+            'city' => 'required|string|max:100',
+            'siret' => 'required|string|max:14',
+        ]);
+        // Find the company by its ID
+        $company = Company::find($request->input('id'));
+
+        // If company is not found, return an error response
+        if (!$company) {
+            return response()->json(['error' => 'Company not found.'], 404);
+        }
+        $company->update($validated);
+        return response()->json(['company' => $company,  'message' => 'Company updated successfully.',], 200);
+    }
 }

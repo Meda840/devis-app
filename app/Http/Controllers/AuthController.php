@@ -12,12 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle user registration.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function register(Request $request)
     {
         // Validate the request
@@ -92,31 +87,30 @@ class AuthController extends Controller
         ], 401);
     }
 
+
     public function getUserInfo(Request $request)
-{
-    Log::info('Request Headers:', $request->headers->all());
-    Log::info('Authorization Header:', $request->header('Authorization'));
-    return response()->json([
-        'user' => $request->user()
-    ]);
-}
+    {
+        return response()->json([
+            'user' => $request->user()
+        ]);
+    }
 
-public function updateUser(Request $request)
-{
-    $user = Auth::user();
+    public function updateUser(Request $request)
+    {
+        $user = Auth::user();
 
-    $validated = $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-    ]);
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        ]);
 
-    $user->update($validated);
+        $user->update($validated);
 
-    return response()->json([
-        'message' => 'User information updated successfully',
-        'user' => $user
-    ]);
-}
+        return response()->json([
+            'message' => 'User information updated successfully',
+            'user' => $user
+        ]);
+    }
 
 }
