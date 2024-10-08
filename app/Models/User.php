@@ -38,7 +38,10 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Company::class, 'company_user');
     }
-
+    public function devis()
+    {
+        return $this->belongsToMany(Devis::class, 'user_devis');
+    }
     /**
      * The attributes that should be cast.
      *

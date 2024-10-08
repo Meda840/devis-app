@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Devis;
 use App\Models\Currency;
 use App\Models\DevisTask;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Models\Service;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
@@ -33,29 +36,20 @@ class DevisController extends Controller
         return response()->json($services);
     }
 
-    /**
-     * Store a newly created Devis in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         // Validate the request data
         $validatedData = $request->validate([
-            // Professional (Pro) details
+
             'pro_name' => 'required|string|max:255',
             'pro_address' => 'required|string|max:255',
             'pro_city' => 'required|string|max:255',
             'pro_siret' => 'nullable|string|max:14',
 
-            // Client details
             'client_name' => 'required|string|max:255',
-
             'client_address' => 'required|string|max:255',
             'client_city' => 'required|string|max:255',
             'client_siret' => 'nullable|string|max:14',
-
             // Devis details
             'description' => 'required',
             'amount' => 'required|numeric',
@@ -66,6 +60,10 @@ class DevisController extends Controller
             'tasks.*.item_description' => 'required|string|max:255',
             'tasks.*.item_price' => 'required|numeric',
             'tasks.*.item_quantity' => 'required|integer|min:1',
+
+             // Optionally, a user ID to attach the devis to a user
+            'user_id' => 'nullable|exists:users,id',  // Ensure user exists in the users table
+
         ]);
 
         try {
@@ -92,6 +90,14 @@ class DevisController extends Controller
                     'item_quantity' => $task['item_quantity'],
                 ]);
             }
+
+            if ($request->has('user_id') && $validatedData['user_id'] !== null) {
+                $user = User::find($validatedData['user_id']);
+                if ($user) {
+                    $user->devis()->attach($devis->id);
+                }
+            }
+
             $this->generatePdf($devis->id);
             return response()->json(['message' => 'Devis created successfully!', 'devis' => $devis], 201);
         } catch (ValidationException $e) {
@@ -116,4 +122,31 @@ class DevisController extends Controller
         $pdf = PDF::loadView('pdf.devis', ['devis' => $devis]);
         return $pdf->download("devis_{$id}.pdf");
     }
+
+    public function getUserDevis()
+    {
+        $user = Auth::user();
+        $devis = $user->load('devis');
+
+        return response()->json($devis);
+    }
+
+    public function deleteDevisById($id)
+{
+    try {
+        $devis = Devis::findOrFail($id);
+        //delete tasks related to this devis if needed
+         $devis->tasks()->delete();
+         $devis->delete();
+        return response()->json(['message' => 'Devis deleted successfully!'], 200);
+    } catch (ModelNotFoundException $e) {
+        return response()->json(['error' => 'Devis not found.'], 404);
+    } catch (Exception $e) {
+        Log::error('Error deleting Devis: ' . $e->getMessage(), [
+            'exception' => $e
+        ]);
+        return response()->json(['error' => 'An error occurred while deleting the devis.'], 500);
+    }
+}
+
 }

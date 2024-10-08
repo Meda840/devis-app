@@ -36,4 +36,9 @@ class Devis extends Model
     {
         return $this->hasMany(DevisTask::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
